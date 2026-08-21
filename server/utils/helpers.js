@@ -3,7 +3,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { DIDSession } from "did-session";
-import { startIndexing } from "../index.js";
 import logger from "../logger/index.js";
 import { GraphQLObjectType, isObjectType } from "graphql";
 
@@ -30,6 +29,7 @@ export async function restartIndexingService() {
 
   // Start indexing service
   console.log("About to start indexing again.");
+  const { startIndexing } = await import("../index.js");
   startIndexing();
 
   return true;

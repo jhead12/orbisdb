@@ -1,4 +1,3 @@
-import { startIndexing } from "../../../index.js";
 import logger from "../../../logger/index.js";
 import { adminDidAuthMiddleware } from "../../../middleware/didAuthMiddleware.js";
 import {
@@ -40,6 +39,7 @@ export default async function (server, opts) {
       global.indexingService.stop();
 
       // Start a new indexing service
+      const { startIndexing } = await import("../../../index.js");
       startIndexing();
 
       // Return results

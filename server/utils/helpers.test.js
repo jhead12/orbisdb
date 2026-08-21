@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 
-// helpers.js imports startIndexing from ../index.js, which boots the full
-// Fastify/Postgres/Ceramic app as a side effect of import — stub it out so
-// this test only loads the pure utility functions. Also stub the logger,
-// which pulls in winston, to keep this a narrow unit test.
-vi.mock("../index.js", () => ({ startIndexing: vi.fn() }));
+// Stub the logger, which pulls in winston, to keep this a narrow unit test.
 vi.mock("../logger/index.js", () => ({
   default: { debug: vi.fn(), error: vi.fn(), info: vi.fn(), warn: vi.fn() },
 }));
