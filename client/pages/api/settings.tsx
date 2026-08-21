@@ -1,8 +1,6 @@
 // client/pages/api/settings.js
 import { CeramicClient } from "@ceramicnetwork/http-client";
 import { ComposeClient } from "@composedb/client";
-import { createHelia } from "helia";
-import { strings } from "@helia/strings";
 import { DID } from "dids";
 import { Ed25519Provider } from "key-did-provider-ed25519";
 import { getResolver } from "key-did-resolver";

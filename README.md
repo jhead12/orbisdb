@@ -472,7 +472,7 @@ curl http://localhost:3000/health
 | `npm run ceramic:start:dev:docker` | Start a Ceramic daemon container for local development          |
 | `npm run wheel:build`              | Run the interactive Ceramic/ComposeDB setup script (`server/wheel`) |
 | `npm run wheel:build:watch`        | Run the setup script with file watching                         |
-| `npm run helia:test`               | Test the IPFS/Helia configuration                                |
+| `npm run ipfs:test`                | Test the IPFS connection against your local Kubo daemon         |
 | `npm run start:ganache`            | Start a local Ganache blockchain instance                        |
 
 ### Security & Validation
