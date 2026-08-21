@@ -202,6 +202,7 @@ export function getTableModelId(tableName, adminDid) {
 }
 
 // Recursive function to search for a context by its ID
+// Note: client/utils/index.js has a same-named findContextById with swapped args (contexts, streamId) — not interchangeable.
 export const findContextById = (id, contexts) => {
   for (let ctx of contexts) {
     if (ctx.stream_id === id) {

@@ -1,7 +1,7 @@
 # web3.db-fileconnector
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![Version](https://img.shields.io/badge/Version-1.8.5-blue)
+![Version](https://img.shields.io/badge/Version-1.8.6-blue)
 ![npm](https://img.shields.io/npm/v/web3.db-fileconnector)
 ![Security](https://img.shields.io/badge/Security-Audited-green)
 ![Docker](https://img.shields.io/badge/Docker-Supported-blue)
@@ -43,108 +43,23 @@ pnpm add web3.db-fileconnector
 yarn add web3.db-fileconnector
 ```
 
-### Quick Integration Example
+### Package Import Notes
+
+The published package currently exposes only its root entry point via `package.json`'s `exports` field:
 
 ```javascript
-import { initIPFS } from "web3.db-fileconnector/server/ipfs/config.js";
-import { GlobalContext } from "web3.db-fileconnector/client/contexts/Global";
-
-// Initialize IPFS with Helia (enhanced in v1.8.4)
-const ipfs = await initIPFS();
-const cid = await ipfs.add("Hello from your app!");
-console.log("Content stored with CID:", cid);
-
-// Use GraphQL API
-import { OrbisDB } from "web3.db-fileconnector/server/orbisdb";
-const orbis = new OrbisDB({
-  ceramic: "http://localhost:7007",
-  node: "http://localhost:7008",
-});
-
-// Query data using GraphQL
-const query = `
-  query GetPosts($limit: Int) {
-    posts(limit: $limit) {
-      id
-      title
-      content
-      author
-      createdAt
-    }
-  }
-`;
-
-const result = await orbis.query(query, { limit: 10 });
-console.log("Posts:", result.data.posts);
-
-// Use in React components
-import { Button } from "web3.db-fileconnector/client/components/Button";
-import { Header } from "web3.db-fileconnector/client/components/Header";
-
-function MyApp() {
-  return (
-    <GlobalContext.Provider>
-      <div>
-        <Header />
-        <Button>My Web3 App</Button>
-        {/* Your app content */}
-      </div>
-    </GlobalContext.Provider>
-  );
-}
+import web3DbFileconnector from "web3.db-fileconnector";
 ```
 
-### Advanced Usage Examples
-
-```javascript
-// File upload with progress tracking
-import { uploadFile } from "web3.db-fileconnector/sdk";
-
-async function handleFileUpload(file) {
-  try {
-    const result = await uploadFile(file, {
-      onProgress: (progress) => {
-        console.log(`Upload progress: ${progress}%`);
-      },
-      maxSize: 100 * 1024 * 1024, // 100MB
-      allowedTypes: ["image/*", "application/pdf"],
-    });
-
-    console.log("File uploaded:", result.cid);
-    return result;
-  } catch (error) {
-    console.error("Upload failed:", error.message);
-  }
-}
-
-// Working with Ceramic streams
-import {
-  createStream,
-  updateStream,
-} from "web3.db-fileconnector/server/ceramic";
-
-async function createPost(data) {
-  const stream = await createStream("Post", {
-    title: data.title,
-    content: data.content,
-    author: data.author,
-    timestamp: new Date().toISOString(),
-  });
-
-  return stream.id;
-}
-```
+Deep/subpath imports (e.g. `web3.db-fileconnector/server/ipfs/config.js`, `web3.db-fileconnector/client/components/Button`, or `web3.db-fileconnector/sdk`) are **not** supported by a real consumer of the published package — Node's `exports` field blocks any subpath other than the package root and `package.json` itself. The `client/sdk` module is also currently a placeholder stub, not a working entry point. To use the IPFS, Ceramic, and UI functionality shown elsewhere in this README, clone the repository and run it locally as described below rather than importing it as an npm dependency.
 
 ### NPM Package Features
 
-- **🔐 Secure IPFS Integration**: Helia-powered decentralized storage (migrated from ipfs-http-client)
-- **📊 GraphQL API**: Ready-to-use data management system with Ceramic Network
-- **🎨 UI Components**: Pre-built React components for Web3 apps
-- **🔧 Utilities**: Helper functions for DID authentication, data syncing
+- **📊 GraphQL API**: Data management system built around the Ceramic Network (used when running the project locally)
+- **🎨 UI Components**: React components for Web3 apps, available in the `client/` app
+- **🔧 Utilities**: Helper functions for DID authentication and data syncing (used internally by the server)
 - **📱 Responsive**: Mobile-friendly components and layouts
-- **⚡ Production Ready**: Optimized for enterprise applications with security auditing
-- **🛡️ Security Focused**: v1.8.4 includes comprehensive security improvements and Docker optimization
-- **🔄 Modern Dependencies**: Uses latest Helia, multiformats, and blockstore technologies
+- **🔄 Modern Dependencies**: Uses Helia, multiformats, and blockstore technologies
 - **🐳 Docker Native**: Full containerization support with multi-platform builds
 
 ## ⏱️ 5-Minute Local Development Setup
@@ -202,6 +117,8 @@ git clone https://github.com/jhead12/web3db-fileconnector.git
 cd web3db-fileconnector
 
 # 2. Install dependencies for the main project
+# Note: root-level dependency installation is currently being reworked and may not
+# install a full tree. The frontend has its own dependencies in client/package.json.
 yarn install
 
 # 3. Start local IPFS (in a separate terminal)
@@ -290,6 +207,8 @@ npm run create-env
 # Edit the .env file with your values
 
 # 3. Install dependencies (use pnpm for faster installs)
+# Note: root-level dependency installation is currently being reworked and may not
+# install a full tree. The frontend has its own dependencies in client/package.json.
 pnpm install
 # OR
 npm install
@@ -410,8 +329,8 @@ docker run -d \
   -e NODE_ENV=production \
   web3db-connector:production
 
-# Or use Docker Compose for full stack
-docker-compose -f docker-compose.prod.yml up -d
+# Or use Docker Compose for the full stack (uses docker-compose.yaml at the repo root)
+docker-compose up -d
 ```
 
 ### Environment Configuration
@@ -519,94 +438,61 @@ curl http://localhost:3000/health
 
 ### Core Development Scripts
 
-| Script               | Description                                  |
-| -------------------- | -------------------------------------------- |
-| `npm run dev`        | Start the development server                 |
-| `npm run build`      | Build the Next.js client application         |
-| `npm run start`      | Run the application in production mode       |
-| `npm run dev:docker` | Start with Docker and run development server |
-| `npm run dev:watch`  | Start with auto-restart on file changes      |
-| `npm run dev:debug`  | Start with debug logging enabled             |
+| Script                | Description                                                                              |
+| --------------------- | ----------------------------------------------------------------------------------------- |
+| `npm run dev`         | Start Ganache, the Ceramic daemon (local network), and the Next.js client dev server together |
+| `npm run build`       | Build the Next.js client application                                                      |
+| `npm run build:start` | Start Ganache, build the client, then run the app in production mode                      |
+| `npm run start`       | Run the application in production mode (`node index.js`)                                  |
+| `npm run start:ipfs`  | Start Ganache, the IPFS daemon, the Ceramic daemon, and the app together                  |
 
 ### Setup & Maintenance
 
-| Script                 | Description                                     |
-| ---------------------- | ----------------------------------------------- |
-| `npm run setup`        | Complete automated setup (IPFS + Ceramic + app) |
-| `npm run shutdown`     | Stop all running services                       |
-| `npm run create-env`   | Create a `.env` file from template              |
-| `npm run system:check` | Verify server dependencies and configuration    |
-| `npm run helia:test`   | Test IPFS/Helia configuration                   |
-| `npm run clean`        | Remove build cache and dependencies             |
-| `npm run clean:all`    | Remove all build artifacts for a fresh start    |
-| `npm run format`       | Format code using Prettier                      |
-| `npm run lint`         | Check code quality with ESLint                  |
-| `npm run permissions`  | Fix shell script permissions                    |
+| Script                     | Description                                                |
+| -------------------------- | ------------------------------------------------------------ |
+| `npm run setup`            | Run the automated setup script, then set up IPFS            |
+| `npm run setup:ipfs`       | Install/configure the IPFS daemon                            |
+| `npm run shutdown`         | Stop all running services                                    |
+| `npm run create-env`       | Create a `.env` file from template                           |
+| `npm run system:check`     | Verify server dependencies and configuration                 |
+| `npm run clean`            | Remove build cache and `node_modules`                        |
+| `npm run clear-port`       | Clear a specific port                                        |
+| `npm run clear:ports`      | Clear the common dev ports (3001, 8545, 7007, 5432, 5431)    |
+| `npm run fix-permissions`  | Fix permissions on local script binaries                     |
+| `npm run fix-dependencies` | Run the dependency-fix script                                |
+| `npm run lint`             | Check code quality with ESLint                                |
 
-### Ceramic & Database
+### Ceramic, Ganache & IPFS
 
-| Script                      | Description                             |
-| --------------------------- | --------------------------------------- |
-| `npm run ceramic:build`     | Set up and manage Ceramic DB            |
-| `npm run ceramic:start`     | Start Ceramic daemon (local network)    |
-| `npm run ceramic:start:dev` | Start Ceramic with dev environment      |
-| `npm run wheel:build`       | Build Ceramic configuration             |
-| `npm run wheel:build:watch` | Build Ceramic config with file watching |
+| Script                             | Description                                                     |
+| ------------------------------------ | ------------------------------------------------------------------ |
+| `npm run ceramic:build`            | Build the Ceramic MCP app                                       |
+| `npm run ceramic:start`            | Start the Ceramic daemon (local network)                        |
+| `npm run ceramic:start:dev`        | Start the Ceramic daemon together with the Next.js dev server   |
+| `npm run ceramic:start:dev:docker` | Start a Ceramic daemon container for local development          |
+| `npm run wheel:build`              | Run the interactive Ceramic/ComposeDB setup script (`server/wheel`) |
+| `npm run wheel:build:watch`        | Run the setup script with file watching                         |
+| `npm run helia:test`               | Test the IPFS/Helia configuration                                |
+| `npm run start:ganache`            | Start a local Ganache blockchain instance                        |
 
-### Docker Management
+### Security & Validation
 
-| Script                   | Description                  |
-| ------------------------ | ---------------------------- |
-| `npm run docker:build`   | Build the Docker image       |
-| `npm run docker:start`   | Start the Docker container   |
-| `npm run docker:stop`    | Stop the Docker container    |
-| `npm run docker:restart` | Restart the Docker container |
-| `npm run docker:remove`  | Remove the Docker container  |
-| `npm run docker:status`  | Show Docker container status |
-
-### Security & Testing
-
-| Script                  | Description                                   |
-| ----------------------- | --------------------------------------------- |
-| `npm run test:security` | Run security audit on production dependencies |
-| `npm run validate`      | Run security audit + linting                  |
-| `npm run permissions`   | Fix shell script permissions                  |
-
-> **🛡️ Security Note**: Version 1.8.4 includes major security improvements including comprehensive dependency updates, Docker security hardening with non-root users, and enhanced permission management.
-
-### Release Management
-
-| Script                    | Description                                  |
-| ------------------------- | -------------------------------------------- |
-| `npm run changelog`       | Generate changelog from conventional commits |
-| `npm run sync-versions`   | Sync version across all package.json files   |
-| `npm run prepare-release` | Prepare release (run validation + setup)     |
-| `npm run version:major`   | Bump major version and create release        |
-| `npm run version:minor`   | Bump minor version and create release        |
-| `npm run version:patch`   | Bump patch version and create release        |
-| `npm run release:major`   | Full major release workflow                  |
-| `npm run release:minor`   | Full minor release workflow                  |
-| `npm run release:patch`   | Full patch release workflow                  |
-
-> **📦 Release Workflow**: Our automated release system includes security validation, version bumping, changelog generation, and npm publishing with conventional commit standards.
+| Script             | Description                                                    |
+| -------------------- | ------------------------------------------------------------- |
+| `npm run validate` | Run pre-publish validation (type-check, security check, lint) |
 
 ### Publishing & Distribution
 
-| Script                    | Description                              |
-| ------------------------- | ---------------------------------------- |
-| `npm run publish:npm`     | Publish to npm with public access        |
-| `npm run publish:docker`  | Build and push Docker image              |
-| `npm run publish:github`  | Publish to npm and Docker                |
-| `npm run publish:release` | Full release: validate + build + publish |
-
-### Git Branch Management
-
-| Script                    | Description                            |
-| ------------------------- | -------------------------------------- |
-| `npm run release:prepare` | Checkout main, pull, and merge develop |
-| `npm run branch:feature`  | Create new feature branch from develop |
-| `npm run branch:hotfix`   | Create new hotfix branch from main     |
-| `npm run branch:cleanup`  | Delete merged branches                 |
+| Script                             | Description                                                    |
+| ------------------------------------ | ------------------------------------------------------------ |
+| `npm run publish:npm`              | Publish the package to npm with public access                  |
+| `npm run publish:github`           | Publish to npm and build/push the Docker image                 |
+| `npm run publish:docker`           | Build the Docker image (versioned tag + `latest`)               |
+| `npm run publish:docker:arm64`     | Build the Docker image for `linux/arm64`                       |
+| `npm run publish:docker:amd64`     | Build the Docker image for `linux/amd64`                       |
+| `npm run publish:docker:registry`  | Build and push a multi-platform image to the registry          |
+| `npm run prepublishOnly`           | Runs `validate` and `build` automatically before `npm publish` |
+| `npm run publish:release`          | Run `validate`, `build`, publish to npm, and push git tags     |
 
 ---
 
@@ -751,17 +637,11 @@ df -h . | awk 'NR==2 {print "Disk usage: " $5}'
 Choose the development mode that best suits your needs:
 
 ```bash
-# Standard development
+# Standard development (Ganache + Ceramic + Next.js dev server)
 yarn dev
 
-# Auto-restart on changes
-yarn dev:watch
-
-# Debug mode with detailed logging
-yarn dev:debug
-
-# Development with Docker
-yarn dev:docker
+# Development with IPFS, Ganache, and Ceramic all running together
+yarn start:ipfs
 ```
 
 ### Building for Production
@@ -777,9 +657,6 @@ yarn start
 ### Code Quality
 
 ```bash
-# Format code
-yarn format
-
 # Lint code
 yarn lint
 ```
@@ -865,7 +742,8 @@ Once Ceramic is running, connect it to OrbisDB:
 ceramic id
 
 # Initialize OrbisDB with your Ceramic ID
-pnpm run init --ceramic-id <ceramic-id>
+# Note: this project does not currently bundle an `init` script for this step;
+# follow OrbisDB's own setup documentation using the Ceramic ID above.
 ```
 
 ---
@@ -885,9 +763,8 @@ pnpm run init --ceramic-id <ceramic-id>
 docker build -t web3db-connector:latest .
 docker run -p 3000:3000 web3db-connector:latest
 
-# Or use the NPM scripts
-npm run docker:build
-npm run docker:start
+# Or use the NPM script to build the image
+npm run publish:docker
 ```
 
 ### Multi-Platform Build (New in v1.8.4)
@@ -896,8 +773,12 @@ npm run docker:start
 # Build for multiple architectures
 docker buildx build --platform linux/arm64,linux/amd64 -t web3db-connector:latest .
 
-# Use the automated script for publishing
-npm run publish:docker:latest
+# Or use the automated scripts for each architecture
+npm run publish:docker:arm64
+npm run publish:docker:amd64
+
+# Build and push a multi-platform image to the registry
+npm run publish:docker:registry
 ```
 
 ### Container Structure
@@ -925,17 +806,17 @@ docker-compose logs
 docker-compose down
 ```
 
-### Using Docker Scripts
+### Managing Docker Services
 
 ```bash
-# Start the pgvector Docker container
-npm run docker:start
+# Start all services (including the pgvector Postgres container)
+docker-compose up -d
 
-# Check Docker status
-npm run docker:status
+# Check container status
+docker-compose ps
 
-# Stop Docker container
-npm run docker:stop
+# Stop all services
+docker-compose down
 ```
 
 ---
@@ -1097,7 +978,7 @@ kill -9 <PID>
 df -h
 
 # Clean up project dependencies
-npm run clean:all
+npm run clean
 
 # Clear Docker cache
 docker system prune -a
@@ -1142,7 +1023,7 @@ export NODE_OPTIONS="--max-old-space-size=8192"  # 8GB
 npm run build
 
 # Alternative: Use Docker for builds
-npm run docker:build
+npm run publish:docker
 ```
 
 **Problem**: PostgreSQL connection errors due to disk space  

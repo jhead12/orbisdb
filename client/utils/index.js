@@ -65,6 +65,7 @@ export const copyToClipboard = async (text) => {
 };
 
 /** Will fint the context using the stream id in the contexts and sub-contexts */
+// Note: server/utils/helpers.js has a same-named findContextById with swapped args (id, contexts) — not interchangeable.
 export function findContextById(contexts, streamId) {
   if (streamId == "global") {
     return {

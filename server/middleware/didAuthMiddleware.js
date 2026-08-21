@@ -56,6 +56,7 @@ export const adminDidAuthMiddleware = async (req, res) => {
     /** Perform different verification logic for shared instances and non-shared ones */
     if (globalSettings.is_shared) {
       // The auth middleware should not be applied for shared instances because users can only modify the slot of the authentication they are using
+      // TODO(security): this grants admin to any authenticated session on shared instances — flagged for a dedicated security review.
       _isAdminsEmpty = false;
       _isAdmin = true;
     } else {

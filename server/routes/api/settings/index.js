@@ -6,6 +6,7 @@ import {
   restartIndexingService,
   updateOrbisDBSettings,
 } from "../../../utils/helpers.js";
+import { cliColors } from "../../../utils/cliColors.js";
 import { enablePreset } from "../../../presets/config.js";
 
 /** Prefixed with /api/settings/ */
