@@ -7,7 +7,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Supported-blue)
 ![Build](https://img.shields.io/badge/Build-Passing-green)
 
-Web3.db-fileconnector connects you to the GraphQL system that manages your Web3 data using the Ceramic network. It's a decentralized, open-source database built on top of web3 technologies with Helia IPFS integration, offering secure, efficient storage and query capabilities for your data.
+Web3.db-fileconnector connects you to the GraphQL system that manages your Web3 data using the Ceramic network. It's a decentralized, open-source database built on top of web3 technologies with IPFS integration, offering secure, efficient storage and query capabilities for your data.
 
 ## 🆕 What's New in v1.8.5
 
@@ -59,7 +59,7 @@ Deep/subpath imports (e.g. `web3.db-fileconnector/server/ipfs/config.js`, `web3.
 - **🎨 UI Components**: React components for Web3 apps, available in the `client/` app
 - **🔧 Utilities**: Helper functions for DID authentication and data syncing (used internally by the server)
 - **📱 Responsive**: Mobile-friendly components and layouts
-- **🔄 Modern Dependencies**: Uses Helia, multiformats, and blockstore technologies
+- **🔄 Modern Dependencies**: Uses `kubo-rpc-client`, multiformats, and blockstore technologies
 - **🐳 Docker Native**: Full containerization support with multi-platform builds
 
 ## ⏱️ 5-Minute Local Development Setup
@@ -82,7 +82,7 @@ npm run setup
 **What the setup script does:**
 
 1. ✅ Installs yarn if not available
-2. ✅ Installs project dependencies (including Helia IPFS)
+2. ✅ Installs project dependencies (including IPFS support)
 3. ✅ Installs IPFS daemon if not already installed
 4. ✅ Installs Ceramic CLI if not already installed
 5. ✅ Creates environment variables (.env file)
@@ -247,7 +247,7 @@ web3db-connector/
 ├── server/                # Backend API server
 │   ├── routes/           # API route handlers
 │   ├── ceramic/          # Ceramic network integration
-│   ├── ipfs/             # IPFS/Helia configuration
+│   ├── ipfs/             # IPFS configuration (kubo-rpc-client)
 │   ├── db/               # Database connections (PostgreSQL, Supabase)
 │   ├── indexing/         # Data indexing services
 │   └── utils/            # Server utilities
@@ -262,7 +262,7 @@ web3db-connector/
 - **Client**: Next.js React application with Web3 components
 - **Server**: Fastify-based API server with GraphQL support
 - **Ceramic**: Decentralized data network integration
-- **IPFS**: Distributed file storage using Helia
+- **IPFS**: Distributed file storage via a local Kubo (go-ipfs) daemon
 - **Database**: PostgreSQL with vector extensions for advanced queries
 
 ## 🔧 Architecture Overview
@@ -271,7 +271,7 @@ web3db-connector/
 graph TB
     A[Client App] --> B[API Server]
     B --> C[Ceramic Network]
-    B --> D[IPFS/Helia]
+    B --> D[IPFS/Kubo]
     B --> E[PostgreSQL]
     C --> F[ComposeDB]
     D --> G[Distributed Storage]
@@ -477,9 +477,12 @@ curl http://localhost:3000/health
 
 ### Security & Validation
 
-| Script             | Description                                                    |
-| -------------------- | ------------------------------------------------------------- |
-| `npm run validate` | Run pre-publish validation (type-check, security check, lint) |
+| Script                  | Description                                                    |
+| ------------------------ | ------------------------------------------------------------- |
+| `npm run validate`      | Run pre-publish validation (type-check, security check, lint) |
+| `npm run test`          | Run the vitest test suite                                      |
+| `npm run typecheck`     | Type-check the client with `tsc --noEmit`                      |
+| `npm run test:security` | Run `yarn audit` (non-blocking; see `SECURITY-AUDIT.md`)       |
 
 ### Publishing & Distribution
 
@@ -659,6 +662,9 @@ yarn start
 ```bash
 # Lint code
 yarn lint
+
+# Run the test suite
+yarn test
 ```
 
 ---
