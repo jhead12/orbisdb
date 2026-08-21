@@ -60,6 +60,19 @@ Also worth noting: `client/package.json` has its own separate `resolutions` bloc
 
 Re-run `yarn audit` periodically to check whether upstream fixes have landed for the no-patch-available items above.
 
+## Update: 2026-08-21 (2) — Exposed private key material
+
+While preparing the 1.8.7 npm release, `npm pack --dry-run` surfaced two committed files containing real, non-placeholder private key seed material that had been published to npm in every prior release:
+
+- `server/Orbisdb-connection/admin.sk`
+- `server/ceramic-app/admin.sk`
+
+Each contained a 32-byte hex seed. Neither file is read by any code in the repository — the actual Ceramic admin seed used at runtime comes from `orbisdb-settings.json` (gitignored, generated locally by the setup flow), so these were dead artifacts, not live configuration. Both files were removed, and `*.sk` was added to `.gitignore` and `.npmignore` to prevent recurrence. **This only stops future exposure** — the specific seed values in git history are already public and should be treated as compromised if they were ever used for anything beyond local testing.
+
+Also found and fixed while auditing what the npm package actually contains:
+- `.npmignore`'s `scripts/` exclusion was also silently excluding `scripts/nextBuild.js`, which `server/index.js` imports unconditionally — every published version back through 1.8.6 was missing a file required at import time. Added an explicit exception.
+- `server/wheel` (a 15MB arm64-only dev CLI binary) and `client/public/uploads/` (1.9MB of unreferenced leftover files) were also shipping in every release; both are now excluded/removed. Package size dropped from 10.9MB to 3.5MB compressed.
+
 ## Recommendation
 
 Before deploying to production, review any remaining vulnerabilities and assess their risk based on your specific deployment environment.

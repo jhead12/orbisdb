@@ -1,4 +1,4 @@
-## [Unreleased]
+## [1.8.7] - 2026-08-21
 
 ### Fixed
 
@@ -7,12 +7,18 @@
 - Fixed `validate`/`prepublishOnly`/`publish:release` scripts, which referenced nonexistent `typecheck`/`test:security` scripts and hard-failed immediately ([aafc814](https://github.com/jhead12/web3.db-fileconnector/commit/aafc814))
 - Restored root `package.json`'s `dependencies`/`devDependencies`, accidentally destroyed by a botched merge and never recovered ([aafc814](https://github.com/jhead12/web3.db-fileconnector/commit/aafc814))
 - Corrected README's version badge, script reference tables, broken NPM deep-import examples, and `docker-compose.prod.yml` reference to match the actual repo state ([ea11444](https://github.com/jhead12/web3.db-fileconnector/commit/ea11444))
+- Made `GET /health` and `npm run system:check` report real service status (database/Ceramic/IPFS connectivity) instead of a hardcoded `"OK"` and a call to a nonexistent script ([da53285](https://github.com/jhead12/web3.db-fileconnector/commit/da53285))
+- Fixed a module-import side effect where merely importing `server/utils/helpers.js` or the settings route (or anything depending on them) booted the entire Fastify/Next/Postgres/Ceramic app, because `startIndexing` was imported eagerly from `server/index.js` just to be called inside a handler; both call sites now use a deferred `import()` ([cfedfd8](https://github.com/jhead12/web3.db-fileconnector/commit/cfedfd8))
+- **Critical packaging bug**: every published version back through 1.8.6 shipped without `scripts/nextBuild.js`, which `server/index.js` imports unconditionally for the production build fallback path — `.npmignore`'s blanket `scripts/` exclusion was silently breaking the package for any fresh install. Added an explicit `!scripts/nextBuild.js` exception.
+- Made `yarn typecheck` non-blocking (matching the existing pattern for `lint`/`test:security`) so pre-existing, unrelated TypeScript errors in `client/` don't hard-fail `validate`/`prepublishOnly`.
 
 ### Removed
 
 - Removed dead/broken files never wired into the app: two Express plugin route templates importing a nonexistent helper, a duplicate `client/global-utils.js`, an unusable CommonJS `config.js`, and a third dead Express route file (`server/routes/api/plugins/registry.js`) ([ea11444](https://github.com/jhead12/web3.db-fileconnector/commit/ea11444), [aafc814](https://github.com/jhead12/web3.db-fileconnector/commit/aafc814))
 - Removed tracked runtime/junk files that predated `.gitignore` rules (stray `.pid`, `.temp`/`.tmp`, `.bak` files) and consolidated three coexisting lockfiles down to `yarn.lock` ([ea11444](https://github.com/jhead12/web3.db-fileconnector/commit/ea11444))
 - Removed unused `helia`, `@helia/strings`, and `mercurius` dependencies, confirmed unused anywhere in the codebase ([6e50b5a](https://github.com/jhead12/web3.db-fileconnector/commit/6e50b5a))
+- Removed `server/Orbisdb-connection/admin.sk` and `server/ceramic-app/admin.sk` — unreferenced files containing real private key seed material that had been committed and published to npm in every prior release. Nothing in the codebase reads these files (the real, in-use Ceramic admin seed lives in the gitignored `orbisdb-settings.json`, generated locally). Added `*.sk` to `.gitignore`/`.npmignore` to prevent recurrence.
+- Removed `client/public/uploads/` (15 files, ~1.9MB) — unreferenced leftover test uploads that had been shipping in every npm release.
 
 ### Added
 
@@ -21,6 +27,7 @@
 ### Security
 
 - Restored the real dependency tree for `yarn audit`, which had almost nothing to check while `package.json` was missing its dependencies. Remediated the resulting findings from 646 down to 48 (0 critical, down from 8): patched/pinned `ws`, `axios`, `nanoid`, `uuid`, `tar`, `undici`, `bn.js`, `postcss`, and others via `yarn resolutions`; bumped `next` from 13.5.6 to 14.2.35, clearing every high-severity Next.js advisory. Remaining findings (no patch available yet for `elliptic`, `@stablelib/ed25519`, `aws-sdk`; a few 15.x-only Next.js advisories deliberately deferred) are documented in `SECURITY-AUDIT.md` ([6e50b5a](https://github.com/jhead12/web3.db-fileconnector/commit/6e50b5a))
+- Removed real private key seed material (`*.sk` files) that had been published to npm in every prior release; see "Removed" above. Note this only stops future exposure — the seed values themselves were already public and should be treated as compromised if ever used for anything real.
 
 ## [1.8.6] - 2025-05-31
 

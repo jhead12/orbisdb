@@ -1,7 +1,7 @@
 # web3.db-fileconnector
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![Version](https://img.shields.io/badge/Version-1.8.6-blue)
+![Version](https://img.shields.io/badge/Version-1.8.7-blue)
 ![npm](https://img.shields.io/npm/v/web3.db-fileconnector)
 ![Security](https://img.shields.io/badge/Security-Audited-green)
 ![Docker](https://img.shields.io/badge/Docker-Supported-blue)

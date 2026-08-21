@@ -50,7 +50,14 @@ Dockerfile.dev
 
 # Scripts that aren't needed in production
 scripts/
+# ...except nextBuild.js, which server/index.js imports directly for the
+# production build fallback path (`import buildNextApp from "../scripts/nextBuild.js"`)
+!scripts/nextBuild.js
 .bin/
+
+# Large arch-specific dev tooling and stray key/secret material — never publish
+server/wheel
+*.sk
 
 # Git files
 .git/

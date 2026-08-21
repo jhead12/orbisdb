@@ -37,6 +37,10 @@ tsbuildinfo
 seed.*
 pid.lock
 
+# Key/seed material — never commit real secrets
+*.sk
+client/public/uploads/
+
 bin/
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 coverage/
