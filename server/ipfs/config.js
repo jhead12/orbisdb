@@ -30,6 +30,14 @@ export const initIPFS = async () => {
         }
         return cids;
       },
+      isConnected: async () => {
+        try {
+          await client.id();
+          return true;
+        } catch {
+          return false;
+        }
+      },
     };
   }
   return ipfsInstance;
