@@ -56,9 +56,27 @@ Root `package.json`'s `dependencies`/`devDependencies` block had been accidental
 **Remaining, deliberately not chased this pass:**
 - `next` (8 findings) — several of the newest Next.js advisories (cache-poisoning, XSS) are only fixed at 15.5.x. A 14.2.x → 15.x jump was deferred as a separate, larger follow-up requiring more integration testing.
 
-Also worth noting: `client/package.json` has its own separate `resolutions` block still pinned to the original 2025-05-30 versions (`ws@8.17.1`, `axios@0.30.0`, `nanoid@5.0.9`, `secp256k1@5.0.1`) — it wasn't touched in this pass, which was scoped to the root dependency tree only.
-
 Re-run `yarn audit` periodically to check whether upstream fixes have landed for the no-patch-available items above.
+
+## Update: 2026-08-22 — client/ dependency remediation
+
+`client/package.json` has its own separate dependency tree and `resolutions` block that hadn't been touched in the pass above — it was still pinned to the original 2025-05-30 versions (`ws@8.17.1`, `axios@0.30.0`, `nanoid@5.0.9`, `secp256k1@5.0.1`). Running `yarn audit` inside `client/` for the first time with its real tree surfaced 569 findings (21 critical, 264 high, 241 moderate, 43 low) across 953 packages — the same pattern as the root audit, just not yet remediated.
+
+**Fixed this pass (mirrors the root remediation):**
+- Removed `helia`/`@helia/strings` — confirmed unused in `client/` as well (nothing imports them). This alone eliminated the `@libp2p/kad-dht` advisory, same as in root.
+- Bumped `axios` (0.30.0 → ^1.18.0), `nanoid` (→ ^5.1.16), `ws` (→ ^8.21.0), `secp256k1` (→ ^4.0.4), `next` (^14.1.0, locked to 14.2.29 → ^14.2.35, matching root).
+- Extended `resolutions` to force patched versions across all transitive copies: `uuid`, `tar`, `tar-fs`, `postcss`, `bn.js`, `undici`, `@opentelemetry/core`, `@opentelemetry/exporter-prometheus`, `@tootallnate/once`, `pbkdf2`, `sha.js`, `form-data`, `protobufjs`, `@protobufjs/utf8`, `node-forge`, `jws`, `minimatch`, `lodash`, `fast-uri`, `ip-address`, `ajv`, `follow-redirects`, `brace-expansion`.
+- Verified `next build` still resolves and runs against 14.2.35 (fails only on the same pre-existing, unrelated `@useorbis/db-sdk/auth` TypeScript error already known and made non-blocking in the root `typecheck` script — not something these bumps introduced).
+
+**Result:** 569 → 41 findings (0 critical, down from 21).
+
+**Remaining, no patch available:**
+- `elliptic` and `@stablelib/ed25519` — same DID-auth chain, same status as root.
+
+**Remaining, deliberately not chased (same as root):**
+- `next` — the rest of the findings are all fixed only at various 15.x patch levels (`>=15.0.8` through `>=15.5.21`). The 14.2.x → 15.x jump is deferred as a separate follow-up, consistent with the root decision.
+
+Root and `client/` are now in sync on dependency remediation status.
 
 ## Update: 2026-08-21 (2) — Exposed private key material
 
