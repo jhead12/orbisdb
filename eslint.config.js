@@ -131,6 +131,17 @@ export default [
   },
   // Ignore problematic files
   {
-    ignores: ["**/*.css", "**/*.json", "node_modules/**"],
+    ignores: [
+      "**/*.css",
+      "**/*.json",
+      "node_modules/**",
+      // Next.js build output, regenerated locally by `next build`/`next dev` —
+      // not source, shouldn't be linted.
+      "**/.next/**",
+      // Scaffold templates for plugin authors, not real source: they use
+      // {{...}}/TEMPLATE: placeholder markers and import a nonexistent
+      // ./baseDataSource, so they were never meant to compile or run as-is.
+      "server/plugins/_template/**",
+    ],
   },
 ];
