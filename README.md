@@ -9,6 +9,17 @@
 
 Web3.db-fileconnector connects you to the GraphQL system that manages your Web3 data using the Ceramic network. It's a decentralized, open-source database built on top of web3 technologies with IPFS integration, offering secure, efficient storage and query capabilities for your data.
 
+## 💡 Use Cases
+
+The combination of content-addressed IPFS storage, structured Ceramic/ComposeDB streams, a GraphQL query layer, and Postgres with vector extensions makes web3.db-fileconnector a good fit for:
+
+- **🎮 Gaming**: Store player inventories, NFT/item metadata, and match history as structured Ceramic streams; use DID-based identity for player accounts and portable, verifiable game progress across titles.
+- **🔬 Research & Data Archiving**: Archive datasets and papers on IPFS for tamper-evident, content-addressed storage; query structured metadata via GraphQL and use the Postgres vector extension for semantic/similarity search over research corpora.
+- **🤖 AI Agent Integration**: The built-in [MCP server](#-mcp-server-ai-agent-integration) lets AI agents (Claude Code, Claude Desktop, etc.) query and store data directly — useful for agent memory, RAG pipelines, or tool-driven data entry.
+- **🪪 Decentralized Identity**: Build apps that authenticate and authorize using DIDs instead of centralized accounts, with associated profile/credential data stored on Ceramic.
+- **🖼️ Media & Content Platforms**: Store media files on IPFS and index searchable metadata (titles, tags, ownership) through the GraphQL API for decentralized content apps.
+- **📊 General Web3 Data Backends**: Use it as a self-hosted, decentralized alternative to a traditional REST/ORM backend for any app that wants verifiable, distributed data storage with a familiar GraphQL interface.
+
 ## 🎥 Demo
 
 <video src="Recordings/ver1.6.9_.mp4" controls width="100%">
@@ -435,6 +446,7 @@ curl http://localhost:7008/health
 
 ## Table of Contents
 
+- [💡 Use Cases](#-use-cases)
 - [🎥 Demo](#-demo)
 - [🆕 What's New in v1.8.4](#-whats-new-in-v184)
 - [📦 NPM Package Installation](#-npm-package-installation)
