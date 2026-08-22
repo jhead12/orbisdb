@@ -1,3 +1,23 @@
+## [1.9.0] - 2026-08-22
+
+### Added
+
+- Added a standalone stdio [MCP](https://modelcontextprotocol.io) server (`npm run mcp`, `server/mcp/`) exposing `system_health`, `list_slots`, `graphql_query`, and `ipfs_add`/`ipfs_get`/`ipfs_list` tools via `@modelcontextprotocol/sdk`, so AI agents (Claude Code, Claude Desktop, etc.) can query and store data directly. It connects to Postgres/Ceramic/IPFS itself rather than proxying a running `yarn start` server ([bfec20a](https://github.com/jhead12/web3.db-fileconnector/commit/bfec20a))
+
+### Fixed
+
+- Fixed `npm run build` (`next build`), which had been silently failing on every version of `client/` this session tested (including pre-upgrade, reproduced against Next 14 to confirm it wasn't a regression): `client/tsconfig.json`'s `moduleResolution` couldn't resolve `@useorbis/db-sdk/auth`'s types (`"node"` → `"bundler"`); `react-ace`/`ace-builds` were declared as root-only dependencies despite being used exclusively in `client/`, producing an unresolvable duplicate `react` type identity for `AceEditor` (moved both into `client/package.json`, bumped `react-ace` 14.0.1 → 15.0.0); and `react-ace`/`ace-builds` were statically imported at module scope, crashing static-page generation with `ReferenceError: ace is not defined` (wrapped in `next/dynamic(..., { ssr: false })` in `components/PluginVariables.tsx`, `pages/data/index.tsx`, `pages/playground/index.tsx`)
+- Fixed a genuine type error in `client/sdk/datasource/neonDataSource.ts` (`this.contextUuid`/`this.jwt` assigned from an untyped `options = {}` parameter) surfaced once the build could get far enough to reach it
+
+### Changed
+
+- Upgraded `next` from `^14.2.35` to `^15.5.21` in both `client/package.json` and root `package.json` (root imports `next` directly for the custom Fastify+Next server in `server/index.js`) — clears every high-severity Next.js advisory. `react`/`react-dom` stay on `^18.2.0`; no React 19 migration needed since the app uses the Pages Router.
+
+### Security
+
+- Remediated `client/` dependency vulnerabilities from 41 down to 21 findings (0 critical, 1 high — down from 8; the remaining high is `sharp`'s inherited libvips CVEs, unrelated to Next.js), driven by the Next.js 15 bump above. See `SECURITY-AUDIT.md` for details.
+- Remediated `client/` dependency vulnerabilities from 569 down to 41 findings (0 critical, down from 21) in a separate pass: removed unused `helia`/`@helia/strings`, bumped `axios`/`nanoid`/`ws`/`secp256k1`, and extended `resolutions` to match the root remediation ([9ec6355](https://github.com/jhead12/web3.db-fileconnector/commit/9ec6355))
+
 ## [1.8.7] - 2026-08-21
 
 ### Fixed

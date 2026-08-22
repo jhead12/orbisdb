@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from "react";
-import AceEditor from "react-ace";
-import "ace-builds/src-min-noconflict/mode-mysql";
-import "ace-builds/src-noconflict/theme-sqlserver";
-import "ace-builds/src-min-noconflict/ext-language_tools";
+import dynamic from "next/dynamic";
 import ModelPicker from "./ModelPicker";
 import Alert from "./Alert";
+
+// react-ace/ace-builds touch browser globals, so they can only load client-side.
+const AceEditor = dynamic(
+  async () => {
+    await Promise.all([
+      import("ace-builds/src-min-noconflict/mode-mysql"),
+      import("ace-builds/src-noconflict/theme-sqlserver"),
+      import("ace-builds/src-min-noconflict/ext-language_tools"),
+    ]);
+    return import("react-ace");
+  },
+  { ssr: false }
+);
 
 export default function LoopPluginVariables({
   variables,

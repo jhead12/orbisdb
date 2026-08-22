@@ -91,6 +91,19 @@ Also found and fixed while auditing what the npm package actually contains:
 - `.npmignore`'s `scripts/` exclusion was also silently excluding `scripts/nextBuild.js`, which `server/index.js` imports unconditionally — every published version back through 1.8.6 was missing a file required at import time. Added an explicit exception.
 - `server/wheel` (a 15MB arm64-only dev CLI binary) and `client/public/uploads/` (1.9MB of unreferenced leftover files) were also shipping in every release; both are now excluded/removed. Package size dropped from 10.9MB to 3.5MB compressed.
 
+## Update: 2026-08-22 (3) — Next.js 15 upgrade in client/
+
+The previous pass deferred the `next` 14.2.x → 15.x jump in `client/` because it required integration testing beyond just `yarn audit`. That testing is now done: `next` was bumped from `^14.2.35` to `^15.5.21` (installed: 15.5.23) in both `client/package.json` and root `package.json` (root imports `next` directly for the custom Fastify+Next server in `server/index.js`).
+
+**Fixed this pass:**
+- Bumped `next` to `^15.5.21` in both `client/` and root; `react`/`react-dom` stay on `^18.2.0` (Next 15's peer range still supports React 18, no React 19 migration needed since the app uses the Pages Router).
+- Verified the custom-server integration (`next({ dev, dir }).prepare()` / `getRequestHandler()` in `server/index.js`) still works under Next 15 — this API is unchanged.
+- Along the way, found and fixed a real, pre-existing `npm run build` failure that predated this upgrade (confirmed by reproducing the identical failure after temporarily reinstalling Next 14): `client/tsconfig.json`'s `moduleResolution: "node"` couldn't resolve `@useorbis/db-sdk/auth`'s types (fixed by switching to `"bundler"`); `react-ace`/`ace-builds` were declared as root-only dependencies but used exclusively in `client/`, causing a duplicate/unresolvable `react` type identity for `AceEditor` (fixed by moving both to `client/package.json` and bumping `react-ace` 14.0.1 → 15.0.0); and `react-ace`/`ace-builds` were statically imported at module scope, crashing static-page generation with `ReferenceError: ace is not defined` because they touch browser globals during server-side page-data collection (fixed by wrapping all three usage sites — `components/PluginVariables.tsx`, `pages/data/index.tsx`, `pages/playground/index.tsx` — in `next/dynamic(..., { ssr: false })`). `npm run build` now completes and prerenders all 18 pages.
+
+**Result:** `client/` audit findings dropped from 41 → 21 (0 critical, 1 high — down from 8; the remaining high is `sharp`'s inherited libvips CVEs, unrelated to Next.js).
+
+**Remaining, no patch available:** unchanged — `elliptic` and `@stablelib/ed25519`.
+
 ## Recommendation
 
 Before deploying to production, review any remaining vulnerabilities and assess their risk based on your specific deployment environment.

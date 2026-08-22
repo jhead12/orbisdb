@@ -17,17 +17,27 @@ import {
 } from "../../components/Icons";
 import AddViewModal from "../../components/Modals/AddViewModal";
 import Alert from "../../components/Alert";
-import AceEditor from "react-ace";
-import "ace-builds/src-min-noconflict/mode-mysql";
-import "ace-builds/src-noconflict/mode-graphqlschema";
-import "ace-builds/src-noconflict/theme-sqlserver";
-import "ace-builds/src-min-noconflict/ext-language_tools";
+import dynamic from "next/dynamic";
 import { cleanDidPath, copyToClipboard, getCleanTableName } from "../../utils";
 import { ContextDropdown } from "../../components/Modals/AssignContext";
 import { createGraphiQLFetcher } from "@graphiql/create-fetcher";
 import { GraphiQL } from "graphiql";
 import "graphiql/graphiql.css";
 import ManageDataRelations from "../../components/Modals/ManageDataRelations";
+
+// react-ace/ace-builds touch browser globals, so they can only load client-side.
+const AceEditor = dynamic(
+  async () => {
+    await Promise.all([
+      import("ace-builds/src-min-noconflict/mode-mysql"),
+      import("ace-builds/src-noconflict/mode-graphqlschema"),
+      import("ace-builds/src-noconflict/theme-sqlserver"),
+      import("ace-builds/src-min-noconflict/ext-language_tools"),
+    ]);
+    return import("react-ace");
+  },
+  { ssr: false }
+);
 
 export default function Data() {
   const { settings, sessionJwt, loadSettings } = useGlobal();

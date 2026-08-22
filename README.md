@@ -1,13 +1,26 @@
 # web3.db-fileconnector
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![Version](https://img.shields.io/badge/Version-1.8.7-blue)
+![Version](https://img.shields.io/badge/Version-1.9.0-blue)
 ![npm](https://img.shields.io/npm/v/web3.db-fileconnector)
 ![Security](https://img.shields.io/badge/Security-Audited-green)
 ![Docker](https://img.shields.io/badge/Docker-Supported-blue)
 ![Build](https://img.shields.io/badge/Build-Passing-green)
 
 Web3.db-fileconnector connects you to the GraphQL system that manages your Web3 data using the Ceramic network. It's a decentralized, open-source database built on top of web3 technologies with IPFS integration, offering secure, efficient storage and query capabilities for your data.
+
+## 🎥 Demo
+
+<video src="Recordings/ver1.6.9_.mp4" controls width="100%">
+  Your browser doesn't support inline video — download the recording directly: <a href="Recordings/ver1.6.9_.mp4">Recordings/ver1.6.9_.mp4</a>
+</video>
+
+## 🆕 What's New in v1.9.0
+
+- **🤖 MCP server**: a standalone [MCP](https://modelcontextprotocol.io) server (`npm run mcp`) so AI agents (Claude Code, Claude Desktop, etc.) can query and store data directly — see [🤖 MCP Server (AI Agent Integration)](#-mcp-server-ai-agent-integration)
+- **⬆️ Next.js 15**: upgraded from 14.2.35 to 15.5.21, clearing every high-severity Next.js advisory (DoS via Server Components/Actions, SSRF via rewrites and WebSocket upgrades, middleware bypass)
+- **🐛 Fixed the production client build**: `npm run build` was silently failing (masked by its own fallback) on a `moduleResolution` mismatch and a stale `react-ace`/`ace-builds` SSR crash; both are fixed and the build now completes and prerenders all pages
+- **🛡️ Security**: `client/` dependency vulnerabilities remediated from 569 down to 21 findings (0 critical, 1 high remaining — unrelated to Next.js, patch pending upstream)
 
 ## 🆕 What's New in v1.8.7
 
@@ -422,6 +435,7 @@ curl http://localhost:7008/health
 
 ## Table of Contents
 
+- [🎥 Demo](#-demo)
 - [🆕 What's New in v1.8.4](#-whats-new-in-v184)
 - [📦 NPM Package Installation](#-npm-package-installation)
 - [⏱️ 5-Minute Local Development Setup](#️-5-minute-local-development-setup)

@@ -1,18 +1,26 @@
 // Client-side adapter for the Neon PostgreSQL data source
 import axios from "axios";
 
+interface NeonDataSourceOptions {
+  /** The UUID of the context with the Neon database plugin */
+  contextUuid?: string;
+  /** Authentication JWT token */
+  jwt?: string;
+}
+
 /**
  * NeonDataSource class provides methods to interact with a Neon PostgreSQL database
  * through the web3db-connector plugin system
  */
 export class NeonDataSource {
+  contextUuid?: string;
+  jwt?: string;
+
   /**
    * Create a new NeonDataSource instance
-   * @param {Object} options - Configuration options
-   * @param {string} options.contextUuid - The UUID of the context with the Neon database plugin
-   * @param {string} options.jwt - Authentication JWT token
+   * @param options - Configuration options
    */
-  constructor(options = {}) {
+  constructor(options: NeonDataSourceOptions = {}) {
     this.contextUuid = options.contextUuid;
     this.jwt = options.jwt;
 
@@ -23,9 +31,9 @@ export class NeonDataSource {
 
   /**
    * Set the JWT token for authentication
-   * @param {string} jwt - The JWT token
+   * @param jwt - The JWT token
    */
-  setJwt(jwt) {
+  setJwt(jwt: string) {
     this.jwt = jwt;
   }
 

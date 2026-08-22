@@ -29,7 +29,7 @@ node_modules/
 jspm_packages/
 web_modules/
 tsconfig.build.json
-tsbuildinfo
+*.tsbuildinfo
 .lock-wscript
 
 .pids
@@ -90,7 +90,7 @@ node_modules/
 jspm_packages/
 web_modules/
 tsconfig.build.json
-tsbuildinfo
+*.tsbuildinfo
 .lock-wscript
 
 .pids

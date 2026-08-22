@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import AceEditor from "react-ace";
-import "ace-builds/src-min-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/theme-nord_dark";
-import "ace-builds/src-min-noconflict/ext-language_tools";
+import dynamic from "next/dynamic";
 import { OrbisDB } from "@useorbis/db-sdk";
 import Button from "../../components/Button";
 import { useGlobal } from "../../contexts/Global";
@@ -14,6 +11,19 @@ import { sleep } from "../../utils";
 import UseExistingModel from "./UseExistingModel";
 import CreateModelInstance from "./CreateModelInstance";
 import QueryModel from "./QueryModel";
+
+// react-ace/ace-builds touch browser globals, so they can only load client-side.
+const AceEditor = dynamic(
+  async () => {
+    await Promise.all([
+      import("ace-builds/src-min-noconflict/mode-javascript"),
+      import("ace-builds/src-noconflict/theme-nord_dark"),
+      import("ace-builds/src-min-noconflict/ext-language_tools"),
+    ]);
+    return import("react-ace");
+  },
+  { ssr: false }
+);
 
 let orbisdb;
 
