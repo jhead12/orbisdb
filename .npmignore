@@ -85,7 +85,11 @@ log/
 ehthumbs.db
 Icon?
 
-# Node modules are already ignored by default
+# npm only excludes the package's own root node_modules by default — nested
+# ones (e.g. client/node_modules, recreated by Next.js's auto-install side
+# effect) are NOT covered by that and must be excluded explicitly.
+**/node_modules/
+
 # Development dependencies
 nodemon.json
 
