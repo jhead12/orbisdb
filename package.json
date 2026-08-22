@@ -3,7 +3,7 @@
   "version": "1.9.0",
   "description": "GraphQL System Built on web3 technologies. Web3.DB is an open database built on top of web3 technologies. It is a decentralized, open-source database that allows users to store and query data in a secure and efficient manner. The system is designed to be user-friendly and accessible to developers of all skill levels.",
   "scripts": {
-    "build": "cd client && PATH=./.bin:$PATH next build || echo 'Build encountered issues but continuing for release'",
+    "build": "cd client && ./node_modules/.bin/next build || echo 'Build encountered issues but continuing for release'",
     "build:start": "yarn ganache-cli && yarn build && yarn start",
     "start": "node index.js",
     "mcp": "node server/mcp/index.js",
