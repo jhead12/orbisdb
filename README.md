@@ -430,6 +430,7 @@ curl http://localhost:7008/health
 - [🔧 Architecture Overview](#-architecture-overview)
 - [🚀 Production Deployment](#-production-deployment)
 - [Available Scripts](#available-scripts)
+- [🤖 MCP Server (AI Agent Integration)](#-mcp-server-ai-agent-integration)
 - [File Handling Best Practices](#file-handling-best-practices)
 - [Development Workflow](#development-workflow)
 - [Detailed Installation](#detailed-installation)
@@ -454,6 +455,7 @@ curl http://localhost:7008/health
 | `npm run build:start` | Start Ganache, build the client, then run the app in production mode                      |
 | `npm run start`       | Run the application in production mode (`node index.js`)                                  |
 | `npm run start:ipfs`  | Start Ganache, the IPFS daemon, the Ceramic daemon, and the app together                  |
+| `npm run mcp`         | Start the [MCP server](#-mcp-server-ai-agent-integration) for AI agents (stdio)           |
 
 ### Setup & Maintenance
 
@@ -505,6 +507,48 @@ curl http://localhost:7008/health
 | `npm run publish:docker:registry`  | Build and push a multi-platform image to the registry          |
 | `npm run prepublishOnly`           | Runs `validate` and `build` automatically before `npm publish` |
 | `npm run publish:release`          | Run `validate`, `build`, publish to npm, and push git tags     |
+
+---
+
+## 🤖 MCP Server (AI Agent Integration)
+
+Web3.DB ships an [MCP](https://modelcontextprotocol.io) server so AI agents (Claude Code, Claude Desktop, etc.) can query and store data directly. It runs standalone over stdio — it connects to Postgres, Ceramic, and IPFS itself (see `server/mcp/backend.js`), so it doesn't require `yarn start`/`yarn dev` to already be running. It does need the same local setup as the rest of the app: a configured `orbisdb-settings.json` (see [Quick Start Guide](#-quick-start-guide)), a reachable Postgres database, and a running IPFS daemon (`npm run setup:ipfs`) if you plan to use the IPFS tools.
+
+**Tools exposed:**
+
+| Tool             | Description                                                              |
+| ----------------- | ------------------------------------------------------------------------- |
+| `system_health`  | Checks Postgres/Ceramic/IPFS connectivity (mirrors `GET /health`)        |
+| `list_slots`     | Lists known database slots (`global` + any configured shared slots)      |
+| `graphql_query`  | Runs a GraphQL query/mutation against a slot's generated Orbis schema     |
+| `ipfs_add`       | Adds content to the local IPFS node, returns its CID                     |
+| `ipfs_get`       | Fetches content from the local IPFS node by CID                          |
+| `ipfs_list`      | Lists CIDs pinned on the local IPFS node                                 |
+
+**Run it directly:**
+
+```bash
+npm run mcp
+```
+
+**Register it with Claude Code:**
+
+```bash
+claude mcp add web3db -- node /absolute/path/to/web3.db-fileconnector/server/mcp/index.js
+```
+
+**Or add it to a Claude Desktop / other MCP client config:**
+
+```json
+{
+  "mcpServers": {
+    "web3db": {
+      "command": "node",
+      "args": ["/absolute/path/to/web3.db-fileconnector/server/mcp/index.js"]
+    }
+  }
+}
+```
 
 ---
 

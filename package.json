@@ -6,6 +6,7 @@
     "build": "cd client && PATH=./.bin:$PATH next build || echo 'Build encountered issues but continuing for release'",
     "build:start": "yarn ganache-cli && yarn build && yarn start",
     "start": "node index.js",
+    "mcp": "node server/mcp/index.js",
     "start:ipfs": "GANACHE_PORT=$(.bin/clear_ports.sh 8545 8546) && CERAMIC_PORT=$(.bin/clear_ports.sh 7007 7008) && concurrently \"yarn ganache-cli --port $GANACHE_PORT\" \"ipfs daemon\" \"ceramic daemon --network inmemory --local-network-id 1 --experimental-features --ethereum-rpc-urls http://localhost:$GANACHE_PORT\" \"node index.js\"",
     "dev": "NEXT_PORT=$(.bin/clear_ports.sh 3001 3002) && GANACHE_PORT=$(.bin/clear_ports.sh 8545 8546) && concurrently \"yarn ganache-cli --port $GANACHE_PORT\" \"ceramic daemon --network local --local-network-id 1 --experimental-features --ethereum-rpc-urls http://localhost:$GANACHE_PORT\" \"cd client && next dev --port $NEXT_PORT\"",
     "system:check": "node ./server/system-check.cjs",
@@ -90,6 +91,7 @@
     "@fastify/static": "^10.1.2",
     "@graphiql/create-fetcher": "^0.1.0",
     "@graphql-tools/schema": "^10.0.23",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@neondatabase/serverless": "^1.0.0",
     "@project-serum/anchor": "^0.26.0",
     "@solana/web3.js": "^1.98.2",
@@ -145,7 +147,8 @@
     "web3": "^4.16.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "ws": "^8.21.0"
+    "ws": "^8.21.0",
+    "zod": "^4.4.3"
   },
   "resolutions": {
     "tar": "^7.5.21",
