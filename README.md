@@ -9,6 +9,15 @@
 
 Web3.db-fileconnector connects you to the GraphQL system that manages your Web3 data using the Ceramic network. It's a decentralized, open-source database built on top of web3 technologies with IPFS integration, offering secure, efficient storage and query capabilities for your data.
 
+## 🆕 What's New in v1.8.7
+
+- **🔒 Real health checks**: `GET /health` and `npm run system:check` now report actual database/Ceramic/IPFS connectivity instead of a hardcoded `"OK"`
+- **🐛 Fixed a module-import side effect** where importing certain server files unintentionally booted the entire app
+- **📦 Fixed npm packaging**: a required build script was silently missing from every published version back through 1.8.6; the package is now smaller (3.5MB vs. 10.9MB) and no longer includes stray dev binaries or unreferenced files
+- **🔑 Removed exposed key material**: unused files containing real private key seeds, previously published to npm, have been deleted
+- **🛡️ Security**: dependency vulnerabilities remediated from 646 down to 48 findings (0 critical); Next.js bumped to 14.2.35
+- **✅ Real test suite**: added `vitest` coverage (`npm test`) for the IPFS integration and core utilities
+
 ## 🆕 What's New in v1.8.5
 
 - **🚀 Performance Boost**: Up to 30% faster query response times with optimized GraphQL resolvers
@@ -394,8 +403,8 @@ const nextConfig = {
 The application includes built-in health checks:
 
 ```bash
-# Check application health
-curl http://localhost:3000/health
+# Check application health (served by the API server, not the Next.js client port)
+curl http://localhost:7008/health
 
 # Response format:
 {
@@ -481,7 +490,7 @@ curl http://localhost:3000/health
 | ------------------------ | ------------------------------------------------------------- |
 | `npm run validate`      | Run pre-publish validation (type-check, security check, lint) |
 | `npm run test`          | Run the vitest test suite                                      |
-| `npm run typecheck`     | Type-check the client with `tsc --noEmit`                      |
+| `npm run typecheck`     | Type-check the client with `tsc --noEmit` (non-blocking; reports errors but continues) |
 | `npm run test:security` | Run `yarn audit` (non-blocking; see `SECURITY-AUDIT.md`)       |
 
 ### Publishing & Distribution
